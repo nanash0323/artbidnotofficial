@@ -7,6 +7,7 @@ def home(request):
 
 urlpatterns = [
     path('', home),  # Root URL response
-    path('admin/', admin.site.urls),
-    path('api/', include('base.urls')),  # Fix: Only include 'base.urls' under 'api/'
+    path('admin/', admin.site.urls),  # Admin panel
+    path('api/', include('base.urls')),  # API endpoints including authentication and products
+    path('api/auth/', include('base.urls')),  # Authentication endpoints (register, login, logout)
 ]

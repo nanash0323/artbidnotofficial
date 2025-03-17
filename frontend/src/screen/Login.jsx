@@ -1,11 +1,11 @@
-// src/screen/Login.jsx
 import React, { useState } from 'react';
 import { Form, Button, Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',  // Django requires "username" instead of "email" by default
     password: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
@@ -19,30 +19,38 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.email || !formData.password) {
+    if (!formData.username || !formData.password) {
       setErrorMessage('Please fill in all fields.');
       return;
     }
 
-    // Simulate login success and redirect
-    console.log('Login successful!');
-    navigate('/');  // Redirect to home page
+    try {
+      const response = await axiosInstance.post('/login/', formData);
+
+      // Save JWT token in local storage
+      localStorage.setItem('authToken', response.data.access);
+
+      console.log('Login successful!', response.data);
+      navigate('/');  // Redirect to home page
+    } catch (error) {
+      setErrorMessage('Invalid username or password.');
+    }
   };
 
   return (
     <Container className="my-5">
       <h2 className="text-center">Login</h2>
       <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="formEmail" className="mb-3">
-          <Form.Label>Email</Form.Label>
+        <Form.Group controlId="formUsername" className="mb-3">
+          <Form.Label>Username</Form.Label>
           <Form.Control
-            type="email"
-            placeholder="Enter email"
-            name="email"
-            value={formData.email}
+            type="text"
+            placeholder="Enter username"
+            name="username"
+            value={formData.username}
             onChange={handleChange}
           />
         </Form.Group>
