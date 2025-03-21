@@ -1,20 +1,25 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from .views import (
-    register_user, login_user, logout_user,
-    getProducts, getProduct, getRoutes, upload_art
+    RegisterView, LoginView, LogoutView,
+    ProductList,  # ✅ Import ProductList
+    upload_art
 )
 
 urlpatterns = [
     # ✅ Authentication Routes
-    path("register/", register_user, name="register"),
-    path("login/", login_user, name="login"),
-    path("logout/", logout_user, name="logout"),
+    path("register/", RegisterView.as_view(), name="register"),
+    path("login/", LoginView.as_view(), name="login"),
+    path("logout/", LogoutView.as_view(), name="logout"),
 
-    # ✅ API Routes
-    path("routes/", getRoutes, name="api-routes"),  # Matches /api/routes/
-    path("products/", getProducts, name="get-products"),  # Matches /api/products/
-    path("products/<str:pk>/", getProduct, name="get-product"),  # Matches /api/products/1/
-    
+    # ✅ Product API Routes
+    path("products/", ProductList.as_view(), name="get-products"),  # Matches /api/products/
+
     # ✅ Image Upload Route
     path("upload/", upload_art, name="upload-art"),  # Matches /api/upload/
 ]
+
+# ✅ Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
